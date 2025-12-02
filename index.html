@@ -1,251 +1,174 @@
 import React, { useState } from 'react';
-import { Menu, X, Home, Code, Users, Mail, Compass } from 'lucide-react';
+import { Menu, X, Code, Github, Mail, Users } from 'lucide-react';
 
 // Danh sách các mục menu
-const navLinks = [
+const navItems = [
   { name: 'Trang Chủ', href: '#home', icon: Home },
+  { name: 'Giới Thiệu', href: '#about', icon: Users },
   { name: 'Dự Án', href: '#projects', icon: Code },
-  { name: 'Dịch Vụ', href: '#services', icon: Compass },
-  { name: 'Về Chúng Tôi', href: '#about', icon: Users },
   { name: 'Liên Hệ', href: '#contact', icon: Mail },
 ];
 
-// Component Logo (Ví dụ đơn giản)
-const Logo = () => (
-  <div className="flex items-center text-xl font-bold text-indigo-600 dark:text-indigo-400">
-    <Code className="w-6 h-6 mr-2" />
-    AppDev
-  </div>
-);
-
-// Component Header/Navigation
-const Navbar = ({ isMenuOpen, toggleMenu }) => {
+// Hàm Home được định nghĩa lại từ lucide-react (hoặc dùng icon bất kỳ)
+function Home(props) {
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-md dark:bg-gray-800 dark:shadow-lg transition-colors duration-300">
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-home">
+      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+  );
+}
+
+// Component Thanh Điều Hướng (Navbar)
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-gray-900 border-b border-gray-700 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Logo />
+          {/* Logo và Tên Website */}
+          <a href="#" className="flex items-center space-x-2 text-white hover:text-cyan-400 transition duration-300">
+            <Github className="w-6 h-6" />
+            <span className="text-xl font-bold tracking-wider">CODE/HUB</span>
+          </a>
 
-          {/* Desktop Navigation Links */}
+          {/* Menu Desktop */}
           <nav className="hidden md:flex space-x-6">
-            {navLinks.map((item) => (
+            {navItems.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
-                className="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition duration-150"
+                className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium transition duration-200 flex items-center space-x-1"
               >
-                {item.name}
+                <item.icon className="w-4 h-4" />
+                <span>{item.name}</span>
               </a>
             ))}
           </nav>
 
-          {/* Mobile Menu Button (Hamburger) */}
-          <div className="md:hidden flex items-center">
+          {/* Nút Mobile Menu */}
+          <div className="md:hidden">
             <button
-              onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition duration-150"
-              aria-expanded={isMenuOpen}
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              aria-controls="mobile-menu"
+              aria-expanded="false"
             >
-              {isMenuOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
+              <span className="sr-only">Mở menu chính</span>
+              {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu Content (Dropdown/Slide-in) */}
-      <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
-          {navLinks.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              onClick={toggleMenu} // Đóng menu khi click vào link
-              className="flex items-center text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-indigo-400 block px-3 py-2 rounded-md transition duration-150"
-            >
-              <item.icon className="w-5 h-5 mr-3" />
-              {item.name}
-            </a>
-          ))}
+      {/* Mobile Menu (Ẩn/Hiện dựa trên state isOpen) */}
+      {isOpen && (
+        <div className="md:hidden" id="mobile-menu">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-700">
+            {navItems.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                onClick={() => setIsOpen(false)} // Đóng menu khi chọn
+                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition duration-200 flex items-center space-x-2"
+              >
+                <item.icon className="w-5 h-5" />
+                <span>{item.name}</span>
+              </a>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </header>
   );
 };
 
-// Component Phần chính (Hero Section)
-const HeroSection = () => (
-  <section id="home" className="bg-gray-50 dark:bg-gray-900 py-20 sm:py-32">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h1 className="text-4xl sm:text-6xl font-extrabold text-gray-900 dark:text-white leading-tight mb-4">
-        Giải pháp lập trình toàn diện <br className="hidden sm:inline" /> cho mọi dự án
-      </h1>
-      <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-        Xây dựng các ứng dụng web mạnh mẽ, hiệu suất cao với công nghệ tiên tiến nhất. Tối ưu hóa UI/UX trên mọi thiết bị.
-      </p>
-      <div className="mt-8 flex justify-center space-x-4">
-        <a
-          href="#projects"
-          className="px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150"
-        >
-          Khám Phá Dự Án
-        </a>
-        <a
-          href="#contact"
-          className="px-6 py-3 border border-indigo-600 text-base font-medium rounded-lg shadow-md text-indigo-600 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-gray-700 transition duration-150"
-        >
-          Bắt Đầu Ngay
-        </a>
-      </div>
-    </div>
-  </section>
-);
-
-// Component Phần nội dung (Features/Services)
-const FeatureCard = ({ icon: Icon, title, description }) => (
-  <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
-    <div className="flex justify-center items-center w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 mb-4 mx-auto">
-      <Icon className="w-6 h-6" />
-    </div>
-    <h3 className="text-lg font-semibold text-gray-900 dark:text-white text-center mb-2">{title}</h3>
-    <p className="text-gray-500 dark:text-gray-400 text-sm text-center">{description}</p>
-  </div>
-);
-
-const FeaturesSection = () => (
-  <section id="services" className="py-16 sm:py-24 bg-white dark:bg-gray-800">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-12">
-        Dịch Vụ Cốt Lõi
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <FeatureCard
-          icon={Code}
-          title="Phát Triển Full-stack"
-          description="Thiết kế và xây dựng ứng dụng đầu cuối với hiệu suất và khả năng mở rộng tối đa."
-        />
-        <FeatureCard
-          icon={Compass}
-          title="UI/UX Tối Ưu"
-          description="Đảm bảo giao diện người dùng trực quan, đẹp mắt, và trải nghiệm người dùng mượt mà trên mọi thiết bị."
-        />
-        <FeatureCard
-          icon={Users}
-          title="Hỗ Trợ Cộng Đồng"
-          description="Tham gia và đóng góp vào các dự án mã nguồn mở, hỗ trợ kỹ thuật 24/7."
-        />
-      </div>
-    </div>
-  </section>
-);
-
-// Component Footer
-const Footer = () => (
-  <footer className="bg-gray-800 dark:bg-gray-900 mt-12">
-    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-        <div className="mb-4 md:mb-0">
-          <Logo />
-          <p className="mt-2 text-sm text-gray-400">© {new Date().getFullYear()} AppDev. Bảo lưu mọi quyền.</p>
-        </div>
-        <div className="flex space-x-6">
-          {navLinks.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="text-gray-400 hover:text-white text-sm transition duration-150"
-            >
-              {item.name}
-            </a>
-          ))}
-        </div>
-      </div>
-    </div>
-  </footer>
-);
-
 // Component chính của ứng dụng
 const App = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   return (
-    // Thiết lập class cho giao diện Dark Mode (nếu cần) và font
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-[Inter] transition-colors duration-300">
-      
-      <Navbar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
+    <div className="min-h-screen bg-gray-950 text-white font-sans">
+      <Navbar />
 
-      <main>
-        <HeroSection />
-        <FeaturesSection />
-
-        {/* Placeholder cho các phần Dự Án, Về Chúng Tôi, và Liên Hệ */}
-        <section id="projects" className="py-16 bg-gray-100 dark:bg-gray-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-4">
-              Dự Án Nổi Bật
-            </h2>
-            <p className="text-center text-gray-600 dark:text-gray-400">
-              Đây là nơi trình bày các dự án đã hoàn thành, thể hiện năng lực lập trình.
+      <main className="pt-16">
+        {/* Phần 1: Hero Section - Chào Mừng */}
+        <section id="home" className="py-20 md:py-32 bg-gray-900 border-b border-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p className="text-sm font-semibold uppercase tracking-wider text-cyan-400 mb-2">
+              Chào mừng bạn đến với kho lưu trữ
             </p>
-            {/* Thêm lưới dự án tại đây */}
-          </div>
-        </section>
-
-        <section id="about" className="py-16 bg-white dark:bg-gray-900">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-4">
-              Về Chúng Tôi
-            </h2>
-            <p className="text-center text-gray-600 dark:text-gray-400">
-              Cam kết mang lại chất lượng và sự đổi mới trong từng dòng mã.
+            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+              TÔI LÀ CHUYÊN GIA LẬP TRÌNH <span className="text-cyan-400">FULL-STACK</span>
+            </h1>
+            <p className="max-w-3xl mx-auto text-xl text-gray-400 mb-8">
+              Nơi chia sẻ các dự án, giải pháp công nghệ và kinh nghiệm phát triển web hiện đại (React, Angular, Node.js, Cloud).
             </p>
-          </div>
-        </section>
-        
-        <section id="contact" className="py-16 bg-gray-100 dark:bg-gray-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-4">
-              Liên Hệ
-            </h2>
-            <div className="max-w-md mx-auto p-8 bg-white dark:bg-gray-900 rounded-xl shadow-2xl">
-                {/* Form liên hệ đơn giản */}
-                <form>
-                    <div className="mb-4">
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tên</label>
-                        <input type="text" id="name" name="name" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Tên của bạn" />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                        <input type="email" id="email" name="email" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="email@example.com" />
-                    </div>
-                    <div className="mb-6">
-                        <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nội dung</label>
-                        <textarea id="message" name="message" rows="4" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Vui lòng nhập nội dung liên hệ"></textarea>
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150"
-                        onClick={(e) => { e.preventDefault(); console.log('Form submitted'); /* Logic xử lý form */ }}
-                    >
-                        Gửi Yêu Cầu
-                    </button>
-                </form>
+            <div className="flex justify-center space-x-4">
+              <a
+                href="#projects"
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-gray-900 bg-cyan-400 hover:bg-cyan-300 transition duration-300 transform hover:scale-105"
+              >
+                <Code className="w-5 h-5 mr-2" />
+                Xem Dự Án Nổi Bật
+              </a>
+              <a
+                href="#contact"
+                className="inline-flex items-center px-6 py-3 border border-cyan-400 text-base font-medium rounded-lg text-cyan-400 hover:bg-cyan-900 transition duration-300 transform hover:scale-105"
+              >
+                <Mail className="w-5 h-5 mr-2" />
+                Liên Hệ Ngay
+              </a>
             </div>
           </div>
         </section>
 
-      </main>
+        {/* Phần 2: Nội Dung - Giới Thiệu Ngắn */}
+        <section id="about" className="py-16 md:py-24">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+              {/* Cột 1: Tiêu đề */}
+              <div className="lg:col-span-1 border-l-4 border-cyan-400 pl-4">
+                <h2 className="text-3xl font-bold text-white mb-2">
+                  Giới Thiệu
+                </h2>
+                <p className="text-gray-400">
+                  Kinh nghiệm và kỹ năng chuyên môn.
+                </p>
+              </div>
 
-      <Footer />
-      
+              {/* Cột 2 & 3: Chi tiết */}
+              <div className="lg:col-span-2 space-y-6">
+                <p className="text-lg text-gray-300">
+                  Với hơn 8 năm kinh nghiệm trong lĩnh vực phát triển phần mềm, tôi tập trung vào việc xây dựng các ứng dụng web hiệu suất cao, dễ bảo trì và có khả năng mở rộng. Tôi là người tiên phong trong việc áp dụng các công nghệ mới nhất như React Hooks, TypeScript và kiến trúc Microservices.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <h4 className="font-semibold text-cyan-400">Frontend</h4>
+                    <ul className="list-disc list-inside text-sm text-gray-400 mt-1">
+                      <li>React, Next.js, Redux</li>
+                      <li>Tailwind CSS, Styled Components</li>
+                    </ul>
+                  </div>
+                  <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <h4 className="font-semibold text-cyan-400">Backend & Database</h4>
+                    <ul className="list-disc list-inside text-sm text-gray-400 mt-1">
+                      <li>Node.js, Express, Python</li>
+                      <li>MongoDB, PostgreSQL, Firestore</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Phần 3: Footer */}
+        <footer className="py-8 bg-gray-900 border-t border-gray-800 mt-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            <p>&copy; {new Date().getFullYear()} CODE/HUB. Được xây dựng với React và Tailwind CSS. Phong cách UI/UX lấy cảm hứng từ GitHub.</p>
+          </div>
+        </footer>
+      </main>
     </div>
   );
 };
