@@ -1,269 +1,251 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X, Home, Users, Briefcase, Phone, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, X, Home, Code, Users, Mail, Compass } from 'lucide-react';
 
 // Danh sách các mục menu
-const navItems = [
-  { id: 'trangchu', name: 'Trang Chủ', icon: Home, href: '#home' },
-  { id: 'gioithieu', name: 'Giới Thiệu', icon: Users, href: '#about' },
-  { id: 'dichvu', name: 'Dịch Vụ', icon: Briefcase, href: '#services' },
-  { id: 'lienhe', name: 'Liên Hệ', icon: Phone, href: '#contact' },
+const navLinks = [
+  { name: 'Trang Chủ', href: '#home', icon: Home },
+  { name: 'Dự Án', href: '#projects', icon: Code },
+  { name: 'Dịch Vụ', href: '#services', icon: Compass },
+  { name: 'Về Chúng Tôi', href: '#about', icon: Users },
+  { name: 'Liên Hệ', href: '#contact', icon: Mail },
 ];
 
-// Component cho từng Section (Phần) của trang
-const Section = ({ id, title, children, className = '' }) => (
-  <section id={id} className={`py-16 md:py-24 ${className}`}>
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Tiêu đề Section */}
-      <h2 className="text-4xl font-extrabold text-gray-900 text-center mb-12 border-b-4 border-teal-500 inline-block px-4 pb-2">
-        {title}
-      </h2>
-      {children}
-    </div>
-  </section>
+// Component Logo (Ví dụ đơn giản)
+const Logo = () => (
+  <div className="flex items-center text-xl font-bold text-indigo-600 dark:text-indigo-400">
+    <Code className="w-6 h-6 mr-2" />
+    AppDev
+  </div>
 );
 
-// Component chính của ứng dụng
-const App = () => {
-  // State để quản lý trạng thái mở/đóng của menu di động
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('trangchu');
-
-  // Lắng nghe sự kiện scroll để xác định section hiện tại
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      {
-        root: null, // viewport
-        rootMargin: '0px 0px -50% 0px', // Khi section nằm giữa viewport
-        threshold: 0.1,
-      }
-    );
-
-    navItems.forEach(item => {
-      const element = document.getElementById(item.id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
-
-    return () => {
-      navItems.forEach(item => {
-        const element = document.getElementById(item.id);
-        if (element) {
-          observer.unobserve(element);
-        }
-      });
-    };
-  }, []);
-
-  // Xử lý cuộn mượt đến section
-  const scrollToSection = (e, id) => {
-    e.preventDefault();
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      // Đóng menu sau khi click trên thiết bị di động
-      if (isMenuOpen) {
-        setIsMenuOpen(false);
-      }
-    }
-  };
-
-  // --- Cấu trúc Navbar ---
-  const Navbar = () => (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg backdrop-blur-md bg-opacity-95">
+// Component Header/Navigation
+const Navbar = ({ isMenuOpen, toggleMenu }) => {
+  return (
+    <header className="sticky top-0 z-50 bg-white shadow-md dark:bg-gray-800 dark:shadow-lg transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <a href="#home" className="text-2xl font-bold text-teal-600 hover:text-teal-800 transition duration-300" onClick={(e) => scrollToSection(e, 'trangchu')}>
-            TÊN DỰ ÁN
-          </a>
+          <Logo />
 
-          {/* Menu Desktop */}
-          <div className="hidden md:flex space-x-6 lg:space-x-8">
-            {navItems.map((item) => (
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex space-x-6">
+            {navLinks.map((item) => (
               <a
-                key={item.id}
+                key={item.name}
                 href={item.href}
-                onClick={(e) => scrollToSection(e, item.id)}
-                className={`flex items-center text-base font-medium transition duration-300 px-3 py-2 rounded-lg 
-                  ${activeSection === item.id 
-                    ? 'text-white bg-teal-600 shadow-md' 
-                    : 'text-gray-600 hover:bg-teal-50 hover:text-teal-700'
-                  }`}
+                className="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium transition duration-150"
               >
-                <item.icon className="w-5 h-5 mr-1" />
                 {item.name}
               </a>
             ))}
-          </div>
+          </nav>
 
-          {/* Nút Menu Mobile */}
-          <div className="md:hidden">
+          {/* Mobile Menu Button (Hamburger) */}
+          <div className="md:hidden flex items-center">
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              aria-label="Toggle Menu"
+              onClick={toggleMenu}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition duration-150"
+              aria-expanded={isMenuOpen}
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Menu Dropdown Mobile */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white shadow-xl">
-          {navItems.map((item) => (
+      {/* Mobile Menu Content (Dropdown/Slide-in) */}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
+          {navLinks.map((item) => (
             <a
-              key={item.id}
+              key={item.name}
               href={item.href}
-              onClick={(e) => scrollToSection(e, item.id)}
-              className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition duration-300 border-t border-gray-100"
+              onClick={toggleMenu} // Đóng menu khi click vào link
+              className="flex items-center text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-indigo-400 block px-3 py-2 rounded-md transition duration-150"
             >
-              <item.icon className="w-5 h-5 mr-3 text-teal-600" />
+              <item.icon className="w-5 h-5 mr-3" />
               {item.name}
             </a>
           ))}
         </div>
-      )}
-    </nav>
+      </div>
+    </header>
   );
+};
 
-  // --- Nội dung chính của Trang ---
-  return (
-    <div className="font-sans text-gray-800 bg-gray-50">
-      <Navbar />
-      <main className="pt-16">
+// Component Phần chính (Hero Section)
+const HeroSection = () => (
+  <section id="home" className="bg-gray-50 dark:bg-gray-900 py-20 sm:py-32">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 className="text-4xl sm:text-6xl font-extrabold text-gray-900 dark:text-white leading-tight mb-4">
+        Giải pháp lập trình toàn diện <br className="hidden sm:inline" /> cho mọi dự án
+      </h1>
+      <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+        Xây dựng các ứng dụng web mạnh mẽ, hiệu suất cao với công nghệ tiên tiến nhất. Tối ưu hóa UI/UX trên mọi thiết bị.
+      </p>
+      <div className="mt-8 flex justify-center space-x-4">
+        <a
+          href="#projects"
+          className="px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150"
+        >
+          Khám Phá Dự Án
+        </a>
+        <a
+          href="#contact"
+          className="px-6 py-3 border border-indigo-600 text-base font-medium rounded-lg shadow-md text-indigo-600 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-gray-700 transition duration-150"
+        >
+          Bắt Đầu Ngay
+        </a>
+      </div>
+    </div>
+  </section>
+);
 
-        {/* 1. Trang Chủ (Hero Section) */}
-        <Section id="trangchu" title="" className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white min-h-screen flex items-center pt-0">
-          <div className="text-center py-20 md:py-32">
-            <p className="text-lg md:text-xl mb-4 font-light opacity-90">Chào mừng đến với</p>
-            <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
-              Giải Pháp Số & Phát Triển Ứng Dụng
-            </h1>
-            <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto font-light">
-              Chúng tôi cung cấp các dịch vụ lập trình và thiết kế UI/UX chuyên nghiệp, giúp doanh nghiệp của bạn phát triển mạnh mẽ.
-            </p>
-            <button 
-              onClick={(e) => scrollToSection(e, 'dichvu')}
-              className="bg-white text-teal-600 font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 hover:scale-105 transition transform duration-300 flex items-center justify-center mx-auto"
+// Component Phần nội dung (Features/Services)
+const FeatureCard = ({ icon: Icon, title, description }) => (
+  <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
+    <div className="flex justify-center items-center w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 mb-4 mx-auto">
+      <Icon className="w-6 h-6" />
+    </div>
+    <h3 className="text-lg font-semibold text-gray-900 dark:text-white text-center mb-2">{title}</h3>
+    <p className="text-gray-500 dark:text-gray-400 text-sm text-center">{description}</p>
+  </div>
+);
+
+const FeaturesSection = () => (
+  <section id="services" className="py-16 sm:py-24 bg-white dark:bg-gray-800">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-12">
+        Dịch Vụ Cốt Lõi
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <FeatureCard
+          icon={Code}
+          title="Phát Triển Full-stack"
+          description="Thiết kế và xây dựng ứng dụng đầu cuối với hiệu suất và khả năng mở rộng tối đa."
+        />
+        <FeatureCard
+          icon={Compass}
+          title="UI/UX Tối Ưu"
+          description="Đảm bảo giao diện người dùng trực quan, đẹp mắt, và trải nghiệm người dùng mượt mà trên mọi thiết bị."
+        />
+        <FeatureCard
+          icon={Users}
+          title="Hỗ Trợ Cộng Đồng"
+          description="Tham gia và đóng góp vào các dự án mã nguồn mở, hỗ trợ kỹ thuật 24/7."
+        />
+      </div>
+    </div>
+  </section>
+);
+
+// Component Footer
+const Footer = () => (
+  <footer className="bg-gray-800 dark:bg-gray-900 mt-12">
+    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+        <div className="mb-4 md:mb-0">
+          <Logo />
+          <p className="mt-2 text-sm text-gray-400">© {new Date().getFullYear()} AppDev. Bảo lưu mọi quyền.</p>
+        </div>
+        <div className="flex space-x-6">
+          {navLinks.map((item) => (
+            <a
+              key={item.name}
+              href={item.href}
+              className="text-gray-400 hover:text-white text-sm transition duration-150"
             >
-              Khám Phá Dịch Vụ Của Chúng Tôi 
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </button>
+              {item.name}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </footer>
+);
+
+// Component chính của ứng dụng
+const App = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  return (
+    // Thiết lập class cho giao diện Dark Mode (nếu cần) và font
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-[Inter] transition-colors duration-300">
+      
+      <Navbar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
+
+      <main>
+        <HeroSection />
+        <FeaturesSection />
+
+        {/* Placeholder cho các phần Dự Án, Về Chúng Tôi, và Liên Hệ */}
+        <section id="projects" className="py-16 bg-gray-100 dark:bg-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-4">
+              Dự Án Nổi Bật
+            </h2>
+            <p className="text-center text-gray-600 dark:text-gray-400">
+              Đây là nơi trình bày các dự án đã hoàn thành, thể hiện năng lực lập trình.
+            </p>
+            {/* Thêm lưới dự án tại đây */}
           </div>
-        </Section>
+        </section>
 
-        {/* 2. Giới Thiệu (About Section) */}
-        <Section id="gioithieu" title="Giới Thiệu Về Chúng Tôi" className="bg-white">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-3xl font-bold text-teal-600 mb-4">Sứ Mệnh Của Chúng Tôi</h3>
-              <p className="text-gray-600 leading-relaxed mb-4">
-                Với hơn 10 năm kinh nghiệm, chúng tôi cam kết mang đến những sản phẩm số chất lượng cao, tối ưu về hiệu suất và thân thiện với người dùng. Đội ngũ chuyên gia của chúng tôi luôn cập nhật những công nghệ mới nhất để đảm bảo giải pháp của bạn luôn dẫn đầu.
-              </p>
-              <p className="text-gray-600 leading-relaxed">
-                Chúng tôi tin rằng công nghệ là cầu nối giữa ý tưởng và thành công. Hãy để chúng tôi đồng hành cùng bạn trên hành trình này.
-              </p>
-            </div>
-            <div className="bg-teal-50 p-6 rounded-xl shadow-lg">
-              <ul className="space-y-4">
-                <li className="flex items-center text-lg text-gray-700"><ChevronRight className="w-5 h-5 mr-2 text-teal-500" />Tư vấn chiến lược số</li>
-                <li className="flex items-center text-lg text-gray-700"><ChevronRight className="w-5 h-5 mr-2 text-teal-500" />Phát triển ứng dụng di động & web</li>
-                <li className="flex items-center text-lg text-gray-700"><ChevronRight className="w-5 h-5 mr-2 text-teal-500" />Thiết kế UI/UX chuyên sâu</li>
-                <li className="flex items-center text-lg text-gray-700"><ChevronRight className="w-5 h-5 mr-2 text-teal-500" />Hỗ trợ kỹ thuật 24/7</li>
-              </ul>
+        <section id="about" className="py-16 bg-white dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-4">
+              Về Chúng Tôi
+            </h2>
+            <p className="text-center text-gray-600 dark:text-gray-400">
+              Cam kết mang lại chất lượng và sự đổi mới trong từng dòng mã.
+            </p>
+          </div>
+        </section>
+        
+        <section id="contact" className="py-16 bg-gray-100 dark:bg-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-4">
+              Liên Hệ
+            </h2>
+            <div className="max-w-md mx-auto p-8 bg-white dark:bg-gray-900 rounded-xl shadow-2xl">
+                {/* Form liên hệ đơn giản */}
+                <form>
+                    <div className="mb-4">
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tên</label>
+                        <input type="text" id="name" name="name" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Tên của bạn" />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                        <input type="email" id="email" name="email" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="email@example.com" />
+                    </div>
+                    <div className="mb-6">
+                        <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nội dung</label>
+                        <textarea id="message" name="message" rows="4" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Vui lòng nhập nội dung liên hệ"></textarea>
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150"
+                        onClick={(e) => { e.preventDefault(); console.log('Form submitted'); /* Logic xử lý form */ }}
+                    >
+                        Gửi Yêu Cầu
+                    </button>
+                </form>
             </div>
           </div>
-        </Section>
-
-        {/* 3. Dịch Vụ (Services Section) */}
-        <Section id="dichvu" title="Các Dịch Vụ Chủ Yếu" className="bg-gray-100">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Thẻ Dịch vụ 1 */}
-            <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition duration-300 border-t-4 border-teal-500">
-              <Briefcase className="w-10 h-10 text-teal-600 mb-4" />
-              <h4 className="text-xl font-bold mb-2">Phát Triển Web</h4>
-              <p className="text-gray-600">Xây dựng các trang web và ứng dụng web hiệu suất cao, đáp ứng mọi yêu cầu kinh doanh của bạn bằng công nghệ hiện đại (React, Next.js, Angular).</p>
-            </div>
-
-            {/* Thẻ Dịch vụ 2 */}
-            <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition duration-300 border-t-4 border-cyan-500">
-              <Phone className="w-10 h-10 text-cyan-600 mb-4" />
-              <h4 className="text-xl font-bold mb-2">Ứng Dụng Di Động</h4>
-              <p className="text-gray-600">Phát triển ứng dụng di động đa nền tảng (iOS & Android) với trải nghiệm người dùng tối ưu và hiệu suất vượt trội.</p>
-            </div>
-
-            {/* Thẻ Dịch vụ 3 */}
-            <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition duration-300 border-t-4 border-indigo-500">
-              <Users className="w-10 h-10 text-indigo-600 mb-4" />
-              <h4 className="text-xl font-bold mb-2">Thiết Kế UI/UX</h4>
-              <p className="text-gray-600">Tạo ra giao diện trực quan, đẹp mắt và dễ sử dụng, đảm bảo người dùng có trải nghiệm tốt nhất với sản phẩm của bạn.</p>
-            </div>
-          </div>
-        </Section>
-
-        {/* 4. Liên Hệ (Contact Section) */}
-        <Section id="lienhe" title="Liên Hệ Với Chúng Tôi" className="bg-white">
-          <div className="max-w-xl mx-auto">
-            <form className="space-y-6 bg-gray-50 p-8 rounded-xl shadow-2xl">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Họ và Tên</label>
-                <input
-                  type="text"
-                  id="name"
-                  placeholder="Nhập họ và tên của bạn"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="Nhập địa chỉ email của bạn"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Nội Dung</label>
-                <textarea
-                  id="message"
-                  rows="4"
-                  placeholder="Bạn muốn trao đổi về dự án nào?"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150"
-                  required
-                ></textarea>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-teal-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-teal-700 transition duration-300 transform hover:scale-[1.01]"
-              >
-                Gửi Tin Nhắn
-              </button>
-            </form>
-          </div>
-        </Section>
+        </section>
 
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm">&copy; {new Date().getFullYear()} TÊN DỰ ÁN. Tất cả các quyền được bảo lưu.</p>
-          <div className="mt-2 text-xs text-gray-400">Thiết kế UI/UX & Responsive bởi Chuyên gia Lập trình.</div>
-        </div>
-      </footer>
+      <Footer />
+      
     </div>
   );
 };
