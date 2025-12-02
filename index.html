@@ -1,0 +1,271 @@
+import React, { useState, useEffect } from 'react';
+import { Menu, X, Home, Users, Briefcase, Phone, ChevronRight } from 'lucide-react';
+
+// Danh sách các mục menu
+const navItems = [
+  { id: 'trangchu', name: 'Trang Chủ', icon: Home, href: '#home' },
+  { id: 'gioithieu', name: 'Giới Thiệu', icon: Users, href: '#about' },
+  { id: 'dichvu', name: 'Dịch Vụ', icon: Briefcase, href: '#services' },
+  { id: 'lienhe', name: 'Liên Hệ', icon: Phone, href: '#contact' },
+];
+
+// Component cho từng Section (Phần) của trang
+const Section = ({ id, title, children, className = '' }) => (
+  <section id={id} className={`py-16 md:py-24 ${className}`}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Tiêu đề Section */}
+      <h2 className="text-4xl font-extrabold text-gray-900 text-center mb-12 border-b-4 border-teal-500 inline-block px-4 pb-2">
+        {title}
+      </h2>
+      {children}
+    </div>
+  </section>
+);
+
+// Component chính của ứng dụng
+const App = () => {
+  // State để quản lý trạng thái mở/đóng của menu di động
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('trangchu');
+
+  // Lắng nghe sự kiện scroll để xác định section hiện tại
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      {
+        root: null, // viewport
+        rootMargin: '0px 0px -50% 0px', // Khi section nằm giữa viewport
+        threshold: 0.1,
+      }
+    );
+
+    navItems.forEach(item => {
+      const element = document.getElementById(item.id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => {
+      navItems.forEach(item => {
+        const element = document.getElementById(item.id);
+        if (element) {
+          observer.unobserve(element);
+        }
+      });
+    };
+  }, []);
+
+  // Xử lý cuộn mượt đến section
+  const scrollToSection = (e, id) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      // Đóng menu sau khi click trên thiết bị di động
+      if (isMenuOpen) {
+        setIsMenuOpen(false);
+      }
+    }
+  };
+
+  // --- Cấu trúc Navbar ---
+  const Navbar = () => (
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg backdrop-blur-md bg-opacity-95">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <a href="#home" className="text-2xl font-bold text-teal-600 hover:text-teal-800 transition duration-300" onClick={(e) => scrollToSection(e, 'trangchu')}>
+            TÊN DỰ ÁN
+          </a>
+
+          {/* Menu Desktop */}
+          <div className="hidden md:flex space-x-6 lg:space-x-8">
+            {navItems.map((item) => (
+              <a
+                key={item.id}
+                href={item.href}
+                onClick={(e) => scrollToSection(e, item.id)}
+                className={`flex items-center text-base font-medium transition duration-300 px-3 py-2 rounded-lg 
+                  ${activeSection === item.id 
+                    ? 'text-white bg-teal-600 shadow-md' 
+                    : 'text-gray-600 hover:bg-teal-50 hover:text-teal-700'
+                  }`}
+              >
+                <item.icon className="w-5 h-5 mr-1" />
+                {item.name}
+              </a>
+            ))}
+          </div>
+
+          {/* Nút Menu Mobile */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              aria-label="Toggle Menu"
+            >
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Menu Dropdown Mobile */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white shadow-xl">
+          {navItems.map((item) => (
+            <a
+              key={item.id}
+              href={item.href}
+              onClick={(e) => scrollToSection(e, item.id)}
+              className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition duration-300 border-t border-gray-100"
+            >
+              <item.icon className="w-5 h-5 mr-3 text-teal-600" />
+              {item.name}
+            </a>
+          ))}
+        </div>
+      )}
+    </nav>
+  );
+
+  // --- Nội dung chính của Trang ---
+  return (
+    <div className="font-sans text-gray-800 bg-gray-50">
+      <Navbar />
+      <main className="pt-16">
+
+        {/* 1. Trang Chủ (Hero Section) */}
+        <Section id="trangchu" title="" className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white min-h-screen flex items-center pt-0">
+          <div className="text-center py-20 md:py-32">
+            <p className="text-lg md:text-xl mb-4 font-light opacity-90">Chào mừng đến với</p>
+            <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
+              Giải Pháp Số & Phát Triển Ứng Dụng
+            </h1>
+            <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto font-light">
+              Chúng tôi cung cấp các dịch vụ lập trình và thiết kế UI/UX chuyên nghiệp, giúp doanh nghiệp của bạn phát triển mạnh mẽ.
+            </p>
+            <button 
+              onClick={(e) => scrollToSection(e, 'dichvu')}
+              className="bg-white text-teal-600 font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 hover:scale-105 transition transform duration-300 flex items-center justify-center mx-auto"
+            >
+              Khám Phá Dịch Vụ Của Chúng Tôi 
+              <ChevronRight className="w-5 h-5 ml-2" />
+            </button>
+          </div>
+        </Section>
+
+        {/* 2. Giới Thiệu (About Section) */}
+        <Section id="gioithieu" title="Giới Thiệu Về Chúng Tôi" className="bg-white">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h3 className="text-3xl font-bold text-teal-600 mb-4">Sứ Mệnh Của Chúng Tôi</h3>
+              <p className="text-gray-600 leading-relaxed mb-4">
+                Với hơn 10 năm kinh nghiệm, chúng tôi cam kết mang đến những sản phẩm số chất lượng cao, tối ưu về hiệu suất và thân thiện với người dùng. Đội ngũ chuyên gia của chúng tôi luôn cập nhật những công nghệ mới nhất để đảm bảo giải pháp của bạn luôn dẫn đầu.
+              </p>
+              <p className="text-gray-600 leading-relaxed">
+                Chúng tôi tin rằng công nghệ là cầu nối giữa ý tưởng và thành công. Hãy để chúng tôi đồng hành cùng bạn trên hành trình này.
+              </p>
+            </div>
+            <div className="bg-teal-50 p-6 rounded-xl shadow-lg">
+              <ul className="space-y-4">
+                <li className="flex items-center text-lg text-gray-700"><ChevronRight className="w-5 h-5 mr-2 text-teal-500" />Tư vấn chiến lược số</li>
+                <li className="flex items-center text-lg text-gray-700"><ChevronRight className="w-5 h-5 mr-2 text-teal-500" />Phát triển ứng dụng di động & web</li>
+                <li className="flex items-center text-lg text-gray-700"><ChevronRight className="w-5 h-5 mr-2 text-teal-500" />Thiết kế UI/UX chuyên sâu</li>
+                <li className="flex items-center text-lg text-gray-700"><ChevronRight className="w-5 h-5 mr-2 text-teal-500" />Hỗ trợ kỹ thuật 24/7</li>
+              </ul>
+            </div>
+          </div>
+        </Section>
+
+        {/* 3. Dịch Vụ (Services Section) */}
+        <Section id="dichvu" title="Các Dịch Vụ Chủ Yếu" className="bg-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Thẻ Dịch vụ 1 */}
+            <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition duration-300 border-t-4 border-teal-500">
+              <Briefcase className="w-10 h-10 text-teal-600 mb-4" />
+              <h4 className="text-xl font-bold mb-2">Phát Triển Web</h4>
+              <p className="text-gray-600">Xây dựng các trang web và ứng dụng web hiệu suất cao, đáp ứng mọi yêu cầu kinh doanh của bạn bằng công nghệ hiện đại (React, Next.js, Angular).</p>
+            </div>
+
+            {/* Thẻ Dịch vụ 2 */}
+            <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition duration-300 border-t-4 border-cyan-500">
+              <Phone className="w-10 h-10 text-cyan-600 mb-4" />
+              <h4 className="text-xl font-bold mb-2">Ứng Dụng Di Động</h4>
+              <p className="text-gray-600">Phát triển ứng dụng di động đa nền tảng (iOS & Android) với trải nghiệm người dùng tối ưu và hiệu suất vượt trội.</p>
+            </div>
+
+            {/* Thẻ Dịch vụ 3 */}
+            <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition duration-300 border-t-4 border-indigo-500">
+              <Users className="w-10 h-10 text-indigo-600 mb-4" />
+              <h4 className="text-xl font-bold mb-2">Thiết Kế UI/UX</h4>
+              <p className="text-gray-600">Tạo ra giao diện trực quan, đẹp mắt và dễ sử dụng, đảm bảo người dùng có trải nghiệm tốt nhất với sản phẩm của bạn.</p>
+            </div>
+          </div>
+        </Section>
+
+        {/* 4. Liên Hệ (Contact Section) */}
+        <Section id="lienhe" title="Liên Hệ Với Chúng Tôi" className="bg-white">
+          <div className="max-w-xl mx-auto">
+            <form className="space-y-6 bg-gray-50 p-8 rounded-xl shadow-2xl">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Họ và Tên</label>
+                <input
+                  type="text"
+                  id="name"
+                  placeholder="Nhập họ và tên của bạn"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="Nhập địa chỉ email của bạn"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Nội Dung</label>
+                <textarea
+                  id="message"
+                  rows="4"
+                  placeholder="Bạn muốn trao đổi về dự án nào?"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 transition duration-150"
+                  required
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-teal-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-teal-700 transition duration-300 transform hover:scale-[1.01]"
+              >
+                Gửi Tin Nhắn
+              </button>
+            </form>
+          </div>
+        </Section>
+
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-sm">&copy; {new Date().getFullYear()} TÊN DỰ ÁN. Tất cả các quyền được bảo lưu.</p>
+          <div className="mt-2 text-xs text-gray-400">Thiết kế UI/UX & Responsive bởi Chuyên gia Lập trình.</div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
